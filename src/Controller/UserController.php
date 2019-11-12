@@ -2,15 +2,48 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\UsersRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UserController extends AbstractController
 {
     /**
-     * @Route("/user", name="user")
+     * @Route("/user/signup", name="signup")
+     * @Method("POST")
      */
-    public function index()
+    public function signup(ObjectManager $manager, Request $request)
+    {
+            $data = $request->getContent();
+            $user = $this->get('serializer')
+                ->deserialize($data, 'Entity\Users', 'json');
+            
+            $manager->persist($user);
+            $manager->flush();
+
+            return new Response(Response::HTTP_CREATED);
+        
+    }
+
+    /**
+     * @Route("/user/login", name="login")
+     */
+    public function login()
+    {
+        return $this->json([
+            'message' => 'Welcome to your new controller!',
+            'path' => 'src/Controller/UserController.php',
+        ]);
+    }
+
+    /**
+     * @Route("/user/delete", name="delete")
+     */
+    public function deleteUser()
     {
         return $this->json([
             'message' => 'Welcome to your new controller!',
