@@ -20,7 +20,7 @@ class UserController extends AbstractController
     {
             $data = $request->getContent();
             $user = $this->get('serializer')
-                ->deserialize($data, 'Entity\Users', 'json');
+                ->deserialize($data, 'App\Entity\Users', 'json');
             
             $manager->persist($user);
             $manager->flush();
@@ -31,6 +31,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/user/login", name="login")
+     * @Method("POST")
      */
     public function login()
     {
@@ -42,6 +43,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/user/delete", name="delete")
+     * @Method("DELETE")
      */
     public function deleteUser()
     {
