@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
@@ -16,17 +17,19 @@ class UserController extends AbstractController
      * @Route("/user/signup", name="signup")
      * @Method("POST")
      */
-    public function signup(ObjectManager $manager, Request $request)
+    public function signup(ObjectManager $manager, Request $request,  UserPasswordEncoderInterface $encoder)
     {
-            $data = $request->getContent();
-            $user = $this->get('serializer')
-                ->deserialize($data, 'App\Entity\Users', 'json');
-            
-            $manager->persist($user);
-            $manager->flush();
+        $data = $request->getContent();
+        $user = $this->get('serializer')
+            ->deserialize($data, 'App\Entity\Users', 'json');
 
-            return new Response(Response::HTTP_CREATED);
+        $password = $user->getPassword();
         
+        $user->setPassword($encoder->encodePassword($user, $password));
+        $manager->persist($user);
+        $manager->flush();
+        return new Response(Response::HTTP_CREATED);
+    
     }
 
     /**
