@@ -24,8 +24,15 @@ class UserController extends AbstractController
             ->deserialize($data, 'App\Entity\Users', 'json');
 
         $password = $user->getPassword();
+        $newDate = new \DateTime();
+        $date = $newDate->format('Y-m-d');
         
-        $user->setPassword($encoder->encodePassword($user, $password));
+        $user->setPassword($encoder->encodePassword($user, $password))
+            ->setRole(1)
+            ->setCreatedAt($newDate)
+            ->setValide(false)
+            ->setToken(hash('md5', $user->getNom(). $date));
+            
         $manager->persist($user);
         $manager->flush();
         return new Response(Response::HTTP_CREATED);
